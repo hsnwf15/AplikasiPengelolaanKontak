@@ -515,37 +515,31 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCariActionPerformed
 
     private void btnExportCSVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportCSVActionPerformed
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Simpan File CSV");
-        int userSelection = fileChooser.showSaveDialog(this);
 
-        if (userSelection == JFileChooser.APPROVE_OPTION) {
-            File fileToSave = fileChooser.getSelectedFile();
-            try (PrintWriter pw = new PrintWriter(fileToSave)) {
-                DefaultTableModel model = (DefaultTableModel) tblKontak.getModel();
-                int rowCount = model.getRowCount();
-                int colCount = model.getColumnCount();
+        String namaFile = "data_kontak.csv";
 
-                // Tulis header
-                for (int i = 0; i < colCount; i++) {
-                    pw.print(model.getColumnName(i));
-                    if (i < colCount - 1) pw.print(",");
-                }
-                pw.println();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(namaFile))) {
+            // Membuat Header
+            writer.write("ID,Nama Kontak,Nomor HP,Kategori");
+            writer.newLine();
 
-                // Tulis data
-                for (int i = 0; i < rowCount; i++) {
-                    for (int j = 0; j < colCount; j++) {
-                        pw.print(model.getValueAt(i, j).toString());
-                        if (j < colCount - 1) pw.print(",");
+            // Menulis data dari table
+            for (int i = 0; i < tblKontak.getRowCount(); i++) {
+                StringBuilder row = new StringBuilder();
+                for (int j = 0; j < tblKontak.getColumnCount(); j++) {
+                    // menambahkan cell nilai yang diikuti dengan koma, kecuali untuk yang terakhir
+                    row.append(tblKontak.getValueAt(i, j));
+                    if (j < tblKontak.getColumnCount() - 1) {
+                        row.append(",");
                     }
-                    pw.println();
                 }
-
-                JOptionPane.showMessageDialog(this, "Data berhasil diekspor!");
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+                writer.write(row.toString());
+                writer.newLine();
             }
+            JOptionPane.showMessageDialog(this, "Data disimpan ke " + namaFile);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error menyimpan data ke CSV: " + e.getMessage());
+            e.printStackTrace();
         }
     }//GEN-LAST:event_btnExportCSVActionPerformed
 
