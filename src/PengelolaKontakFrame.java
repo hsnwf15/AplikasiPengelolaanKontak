@@ -1,3 +1,10 @@
+import java.sql.*;
+import javax.swing.*;
+import java.io.*;
+
+import javax.swing.JOptionPane;
+import java.sql.SQLException;
+import javax.swing.table.DefaultTableModel;
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -14,8 +21,50 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
      */
     public PengelolaKontakFrame() {
         initComponents();
+        DefaultTableModel model = new DefaultTableModel(new String[]{"ID", "Nama Kontak", "Nomor HP", "Kategori"}, 0);
+        tblKontak.setModel(model);
+        loadTable();
+        
+    }
+    
+    private Connection connect() {
+        Connection conn = null;
+        try {
+            String url = "jdbc:sqlite:E:/kuliah/PBO2/AplikasiPengelolaanKontak/src/kontak.db"; // Path ke database
+            conn = DriverManager.getConnection(url);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Koneksi gagal: " + e.getMessage());
+        }
+        return conn;
     }
 
+    private void loadTable() {
+        DefaultTableModel model = (DefaultTableModel) tblKontak.getModel();
+        model.setRowCount(0); // Hapus data sebelumnya
+        try (Connection conn = connect()) {
+            String sql = "SELECT * FROM kontak";
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getInt("id"),
+                    rs.getString("nama"),
+                    rs.getString("nomor_hp"),
+                    rs.getString("kategori")
+                });
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error loading data: " + e.getMessage());
+        }
+    }
+
+    private void clearFields() {
+        txtNama.setText("");
+        txtNomorHP.setText("");
+        cmbKategori.setSelectedIndex(0);
+    }
+
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -29,28 +78,30 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblKontak = new javax.swing.JTable();
         jPanel5 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
-        jButton4 = new javax.swing.JButton();
+        txtCari = new javax.swing.JTextField();
+        btnCari = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        lstCari = new javax.swing.JList<>();
         jPanel6 = new javax.swing.JPanel();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
+        btnImportCSV = new javax.swing.JButton();
+        btnExportCSV = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        btnEdit = new javax.swing.JButton();
+        btnHapus = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        txtNama = new javax.swing.JTextField();
+        txtNomorHP = new javax.swing.JTextField();
+        cmbKategori = new javax.swing.JComboBox<>();
         jPanel4 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
+        btnTambah = new javax.swing.JButton();
+        btnSimpan = new javax.swing.JButton();
+        btnClear = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -58,7 +109,7 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblKontak.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -69,7 +120,7 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tblKontak);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -92,22 +143,27 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.ipadx = 100;
         gridBagConstraints.insets = new java.awt.Insets(5, 7, 5, 7);
-        jPanel5.add(jTextField3, gridBagConstraints);
+        jPanel5.add(txtCari, gridBagConstraints);
 
-        jButton4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton4.setText("Cari");
+        btnCari.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnCari.setText("Cari");
+        btnCari.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCariActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(5, 7, 5, 7);
-        jPanel5.add(jButton4, gridBagConstraints);
+        jPanel5.add(btnCari, gridBagConstraints);
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2" };
+        lstCari.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Nama Kontak", "Nomor Handphone" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
-        jScrollPane2.setViewportView(jList1);
+        jScrollPane2.setViewportView(lstCari);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -125,20 +181,30 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
 
         jPanel6.setLayout(new java.awt.GridBagLayout());
 
-        jButton5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton5.setText("Import CSV");
+        btnImportCSV.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnImportCSV.setText("Import CSV");
+        btnImportCSV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnImportCSVActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        jPanel6.add(jButton5, gridBagConstraints);
+        jPanel6.add(btnImportCSV, gridBagConstraints);
 
-        jButton6.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton6.setText("Export ke CSV");
+        btnExportCSV.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnExportCSV.setText("Export ke CSV");
+        btnExportCSV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportCSVActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 6);
-        jPanel6.add(jButton6, gridBagConstraints);
+        jPanel6.add(btnExportCSV, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -149,21 +215,31 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
 
         jPanel7.setLayout(new java.awt.GridBagLayout());
 
-        jButton2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton2.setText("Edit Kontak");
+        btnEdit.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnEdit.setText("Edit Kontak");
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        jPanel7.add(jButton2, gridBagConstraints);
+        jPanel7.add(btnEdit, gridBagConstraints);
 
-        jButton3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton3.setText("Hapus Kontak");
+        btnHapus.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnHapus.setText("Hapus Kontak");
+        btnHapus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHapusActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        jPanel7.add(jButton3, gridBagConstraints);
+        jPanel7.add(btnHapus, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -208,33 +284,64 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 250;
         gridBagConstraints.insets = new java.awt.Insets(4, 8, 4, 6);
-        jPanel1.add(jTextField1, gridBagConstraints);
+        jPanel1.add(txtNama, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 250;
         gridBagConstraints.insets = new java.awt.Insets(4, 8, 4, 6);
-        jPanel1.add(jTextField2, gridBagConstraints);
+        jPanel1.add(txtNomorHP, gridBagConstraints);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbKategori.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 250;
         gridBagConstraints.insets = new java.awt.Insets(4, 8, 4, 6);
-        jPanel1.add(jComboBox1, gridBagConstraints);
+        jPanel1.add(cmbKategori, gridBagConstraints);
 
         jPanel4.setLayout(new java.awt.GridBagLayout());
 
-        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton1.setText("Tambah Kontak");
+        btnTambah.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnTambah.setText("Tambah Kontak");
+        btnTambah.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnTambahActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel4.add(btnTambah, gridBagConstraints);
+
+        btnSimpan.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnSimpan.setText("Simpan Perubahan");
+        btnSimpan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSimpanActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel4.add(btnSimpan, gridBagConstraints);
+
+        btnClear.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnClear.setText("Clear");
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        jPanel4.add(jButton1, gridBagConstraints);
+        jPanel4.add(btnClear, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -269,6 +376,213 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
+        String nama = txtNama.getText();
+        String nomor = txtNomorHP.getText();
+        String kategori = cmbKategori.getSelectedItem().toString();
+
+        if (nama.isEmpty() || nomor.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Nama dan Nomor HP wajib diisi!");
+            return;
+        }
+
+        try (Connection conn = connect()) {
+            String sql = "INSERT INTO kontak (nama, nomor_hp, kategori) VALUES (?, ?, ?)";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, nama);
+            pstmt.setString(2, nomor);
+            pstmt.setString(3, kategori);
+            pstmt.executeUpdate();
+
+            JOptionPane.showMessageDialog(this, "Kontak berhasil ditambahkan!");
+            loadTable();
+            clearFields(); // Metode untuk mengosongkan input
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        }
+    }//GEN-LAST:event_btnTambahActionPerformed
+
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
+        int selectedRow = tblKontak.getSelectedRow();
+        if (selectedRow >= 0) {
+            txtNama.setText(tblKontak.getValueAt(selectedRow, 1).toString());
+            txtNomorHP.setText(tblKontak.getValueAt(selectedRow, 2).toString());
+            cmbKategori.setSelectedItem(tblKontak.getValueAt(selectedRow, 3).toString());
+        } else {
+            JOptionPane.showMessageDialog(this, "Pilih kontak untuk diubah!");
+        }
+    }//GEN-LAST:event_btnEditActionPerformed
+
+    private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
+        int selectedRow = tblKontak.getSelectedRow();
+        if (selectedRow >= 0) {
+            int id = Integer.parseInt(tblKontak.getValueAt(selectedRow, 0).toString());
+            String nama = txtNama.getText();
+            String nomor = txtNomorHP.getText();
+            String kategori = cmbKategori.getSelectedItem().toString();
+
+            try (Connection conn = connect()) {
+                String sql = "UPDATE kontak SET nama = ?, nomor_hp = ?, kategori = ? WHERE id = ?";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, nama);
+                pstmt.setString(2, nomor);
+                pstmt.setString(3, kategori);
+                pstmt.setInt(4, id);
+                pstmt.executeUpdate();
+
+                JOptionPane.showMessageDialog(this, "Kontak berhasil diperbarui!");
+                loadTable();
+                clearFields();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Pilih kontak untuk disimpan!");
+        }
+    }//GEN-LAST:event_btnSimpanActionPerformed
+
+    private void btnCariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCariActionPerformed
+        String dasar = lstCari.getSelectedValue(); // Dasar pencarian
+        String keyword = txtCari.getText();       // Kata kunci pencarian
+
+        if (dasar == null || keyword.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Pilih dasar pencarian dan masukkan kata kunci!");
+            return;
+        }
+
+        DefaultTableModel model = (DefaultTableModel) tblKontak.getModel();
+        model.setRowCount(0); // Bersihkan data di tabel
+
+        try (Connection conn = connect()) {
+            String sql;
+            if (dasar.equals("Nama Kontak")) {
+                sql = "SELECT * FROM kontak WHERE nama LIKE ?";
+            } else {
+                sql = "SELECT * FROM kontak WHERE nomor_hp LIKE ?";
+            }
+
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, "%" + keyword + "%");
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getInt("id"),
+                    rs.getString("nama"),
+                    rs.getString("nomor_hp"),
+                    rs.getString("kategori")
+                });
+            }
+
+            if (model.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(this, "Tidak ada data yang sesuai!");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        }
+    }//GEN-LAST:event_btnCariActionPerformed
+
+    private void btnExportCSVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportCSVActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Simpan File CSV");
+        int userSelection = fileChooser.showSaveDialog(this);
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            try (PrintWriter pw = new PrintWriter(fileToSave)) {
+                DefaultTableModel model = (DefaultTableModel) tblKontak.getModel();
+                int rowCount = model.getRowCount();
+                int colCount = model.getColumnCount();
+
+                // Tulis header
+                for (int i = 0; i < colCount; i++) {
+                    pw.print(model.getColumnName(i));
+                    if (i < colCount - 1) pw.print(",");
+                }
+                pw.println();
+
+                // Tulis data
+                for (int i = 0; i < rowCount; i++) {
+                    for (int j = 0; j < colCount; j++) {
+                        pw.print(model.getValueAt(i, j).toString());
+                        if (j < colCount - 1) pw.print(",");
+                    }
+                    pw.println();
+                }
+
+                JOptionPane.showMessageDialog(this, "Data berhasil diekspor!");
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            }
+        }
+    }//GEN-LAST:event_btnExportCSVActionPerformed
+
+    private void btnImportCSVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportCSVActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Pilih File CSV");
+        int userSelection = fileChooser.showOpenDialog(this);
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToOpen = fileChooser.getSelectedFile();
+            try (BufferedReader br = new BufferedReader(new FileReader(fileToOpen))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    String[] data = line.split(",");
+                    if (data.length == 4) { // Pastikan format sesuai
+                        try (Connection conn = connect()) {
+                            String sql = "INSERT INTO kontak (nama, nomor_hp, kategori) VALUES (?, ?, ?)";
+                            PreparedStatement pstmt = conn.prepareStatement(sql);
+                            pstmt.setString(1, data[1]); // Nama
+                            pstmt.setString(2, data[2]); // Nomor HP
+                            pstmt.setString(3, data[3]); // Kategori
+                            pstmt.executeUpdate();
+                        } catch (SQLException e) {
+                            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+                        }
+                    }
+                }
+
+                JOptionPane.showMessageDialog(this, "Data berhasil diimpor!");
+                loadTable();
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            }
+        }
+    }//GEN-LAST:event_btnImportCSVActionPerformed
+
+    private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
+        int selectedRow = tblKontak.getSelectedRow(); // Mendapatkan baris yang dipilih
+        if (selectedRow >= 0) {
+            // Ambil ID dari tabel
+            int id = Integer.parseInt(tblKontak.getValueAt(selectedRow, 0).toString());
+
+            // Konfirmasi penghapusan
+            int confirm = JOptionPane.showConfirmDialog(this, 
+                "Apakah Anda yakin ingin menghapus kontak ini?", 
+                "Konfirmasi Hapus", JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                try (Connection conn = connect()) {
+                    String sql = "DELETE FROM kontak WHERE id = ?";
+                    PreparedStatement pstmt = conn.prepareStatement(sql);
+                    pstmt.setInt(1, id);
+                    pstmt.executeUpdate();
+
+                    JOptionPane.showMessageDialog(this, "Kontak berhasil dihapus!");
+                    loadTable(); // Refresh tabel
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Pilih kontak untuk dihapus!");
+        }
+    }//GEN-LAST:event_btnHapusActionPerformed
+
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+        clearFields();
+    }//GEN-LAST:event_btnClearActionPerformed
 
     /**
      * @param args the command line arguments
@@ -306,18 +620,19 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JButton btnCari;
+    private javax.swing.JButton btnClear;
+    private javax.swing.JButton btnEdit;
+    private javax.swing.JButton btnExportCSV;
+    private javax.swing.JButton btnHapus;
+    private javax.swing.JButton btnImportCSV;
+    private javax.swing.JButton btnSimpan;
+    private javax.swing.JButton btnTambah;
+    private javax.swing.JComboBox<String> cmbKategori;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -327,9 +642,10 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JList<String> lstCari;
+    private javax.swing.JTable tblKontak;
+    private javax.swing.JTextField txtCari;
+    private javax.swing.JTextField txtNama;
+    private javax.swing.JTextField txtNomorHP;
     // End of variables declaration//GEN-END:variables
 }
