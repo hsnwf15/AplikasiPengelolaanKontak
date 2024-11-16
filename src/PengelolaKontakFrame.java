@@ -1,3 +1,6 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.*;
 import javax.swing.*;
 import java.io.*;
@@ -21,9 +24,22 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
      */
     public PengelolaKontakFrame() {
         initComponents();
-        loadTable();
         DefaultTableModel model = new DefaultTableModel(new String[]{"ID", "Nama Kontak", "Nomor HP", "Kategori"}, 0);
         tblKontak.setModel(model);
+        loadTable();
+        
+        txtNomorHP.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+                String text = txtNomorHP.getText();
+
+                // Hanya izinkan angka dan batasi panjang input hingga 12
+                if (!Character.isDigit(c) || text.length() >= 12) {
+                    e.consume(); // Hentikan input karakter
+                }
+            }
+        });
     }
     
     private Connection connect() {
@@ -62,6 +78,8 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
         txtNomorHP.setText("");
         cmbKategori.setSelectedIndex(0);
     }
+
+    
 
     
     /**
@@ -284,6 +302,12 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
         gridBagConstraints.ipadx = 250;
         gridBagConstraints.insets = new java.awt.Insets(4, 8, 4, 6);
         jPanel1.add(txtNama, gridBagConstraints);
+
+        txtNomorHP.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtNomorHPKeyPressed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -292,7 +316,7 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(4, 8, 4, 6);
         jPanel1.add(txtNomorHP, gridBagConstraints);
 
-        cmbKategori.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbKategori.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Keluarga", "Teman", "Partner Kerja" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -380,10 +404,18 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
         String nama = txtNama.getText();
         String nomor = txtNomorHP.getText();
         String kategori = cmbKategori.getSelectedItem().toString();
+        String nomorHP = txtNomorHP.getText();
 
         if (nama.isEmpty() || nomor.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Nama dan Nomor HP wajib diisi!");
             return;
+        }
+      
+        // Validasi panjang nomor HP
+        
+        if (nomorHP.length() != 12) {
+            JOptionPane.showMessageDialog(this, "Nomor HP harus tepat 12 digit!", "Validasi Error", JOptionPane.ERROR_MESSAGE);
+            return; // Hentikan proses jika input tidak valid
         }
 
         try (Connection conn = connect()) {
@@ -582,6 +614,10 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
         clearFields();
     }//GEN-LAST:event_btnClearActionPerformed
+
+    private void txtNomorHPKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNomorHPKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNomorHPKeyPressed
 
     /**
      * @param args the command line arguments
