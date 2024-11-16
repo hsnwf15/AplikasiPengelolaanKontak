@@ -21,10 +21,9 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
      */
     public PengelolaKontakFrame() {
         initComponents();
+        loadTable();
         DefaultTableModel model = new DefaultTableModel(new String[]{"ID", "Nama Kontak", "Nomor HP", "Kategori"}, 0);
         tblKontak.setModel(model);
-        loadTable();
-        
     }
     
     private Connection connect() {
@@ -168,7 +167,7 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.ipadx = 81;
+        gridBagConstraints.ipadx = 115;
         gridBagConstraints.ipady = 22;
         jPanel5.add(jScrollPane2, gridBagConstraints);
 
@@ -363,9 +362,9 @@ public class PengelolaKontakFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 689, Short.MAX_VALUE)
+            .addGap(0, 746, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE))
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 746, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
