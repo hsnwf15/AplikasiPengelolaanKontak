@@ -106,6 +106,9 @@ Aplikasi Pengelolaan Kontak adalah aplikasi berbasis Java yang dirancang untuk m
   ![](import.PNG)
   ![](import2.PNG)
 
+- ### Hasil simpan ke file CSV
+  ![](simpan.PNG)
+
 ## Lisensi
 
 Proyek ini boleh dipergunakan untuk pembelajaran atau semacamnya.
